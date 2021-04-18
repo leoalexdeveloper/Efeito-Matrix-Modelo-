@@ -44,7 +44,6 @@ class Blocks{
         ctx.fillStyle = "rgb(0,255,0)";
         ctx.shadowColor = "rgba(255,255,255,0.5)";
         ctx.shadowBlur = 0.2;
-        
     }
 }
 
@@ -101,7 +100,6 @@ class Game{
     clearCanvas(){
         //ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.restore();
-        
         ctx.fillStyle = "black";
         ctx.globalAlpha = 0.1;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
