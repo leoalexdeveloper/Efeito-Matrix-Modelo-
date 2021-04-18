@@ -2,128 +2,136 @@ var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 
 class Blocks{
-    constructor(space = 0, keySpace){
-        this.width = 10;
-        this.height = 10;
-        this.x = space[keySpace];
+    constructor(){
+        this.x = 0;
         this.y = 0;
-        this.blockSpeed = this.height/2;
-        this.characterTurn;
-        this.blockSpace = space;
-        this.character = this.returnChar();
-        this.countCharSpeed = 10;
-        this.moveBlocks();
-        this.changeText();
-    }
+        this.width = 20;
+        this.height = 20;
+        this.globalAlpha = 1;
+        this.countAlpha = 0;
+        this.tresholdAlpha = 30;
 
-    createBlocks(){
-        
-        ctx.font = "30px Arial";
-        ctx.fillStyle="white";
-        ctx.fillText(this.character, this.x, this.y/2);
+        this.reduceGlobalAlpha();
     }
 
     moveBlocks(){
-        this.y += this.blockSpeed;
+        this.y += this.height;
     }
 
-    returnChar(){
-        return String.fromCharCode(Math.round(Math.random()*128))
-    }
-
-    changeText(){
+    reduceGlobalAlpha(){
         let thisObject = this;
-
         requestAnimationFrame(()=>{
-            thisObject.changeText();
-        });
-
-        if(this.countCharSpeed > 10){
-            this.countCharSpeed = 0;
-            this.character = this.returnChar();
+            thisObject.reduceGlobalAlpha();
+        })
+        this.countAlpha++;
+        if(this.countAlpha > this.tresholdAlpha){
+            this.countAlpha = 0;
+            this.globalAlpha -= 0.2;
+            if(this.globalAlpha <= 0){
+                this.globalAlpha = 0;
+            }
         }
+    }
 
-        this.countCharSpeed++;
+    randomCharacters(){
+        return Math.round(Math.random()*128);
+    }
+
+    renderBlock(){
+        ctx.globalAlpha = this.globalAlpha.toFixed(1);
+        ctx.font = "20px Georgia";
+        ctx.fillText(String.fromCharCode(this.randomCharacters()), this.x, this.y);
+        ctx.fillStyle = "#fff";
+        
     }
 }
 
-class matrix{
+class Game{
     constructor(){
         this.blocks = [];
-        this.countToCreateBlocks = 0;
-        this.countThreshold = 10;
-        this.blockSpace = [];
-        this.blockSpaceKey = Math.round(Math.random()*((canvas.width/100)));
+        this.blockSpaces = [];
+        this.blockSpacesLength;
+        this.selectedBlockSpace = ''
+        this.selectedBlockSpaces = [];
+        this.countGameSpeed = 0;
+        this.gameSpeedTreshold = 1;
     }
-    /* puxa os blocos para um array */
-    createBlocks(){
-        for(let i = 0; i < 10; i++){
-            let element = new Blocks(this.blockSpace, this.blockSpaceKey);
-            element.y = element.y=-50 * i;
-            this.blocks.push(element);
+    
+
+    loadBlocks(){
+        //for(let i = 0; i < Math.round(Math.random()*10); i++){
+            let blocks = new Blocks();
+            blocks.x = this.blockSpaces[this.selectBlockSpaces()];
+            this.blocks.push(blocks);
+        //}
+        
+    }
+
+    defineBlockSpaces(){
+        let blocksY = (new Blocks()).width
+        for(let i = 0; i < canvas.width; i += blocksY){
+            this.blockSpaces.push(i);
         }
-    }
-    /* escolhe um index de referencia para o posicionamento x */
-    pickSpaceBlocks(){
-        
-            this.blockSpaceKey = Math.round(Math.random()*this.blockSpace.length);
-        
+        this.blockSpacesLength = this.blockSpaces.length;
     }
 
-    /* monta um array com spaços fixos com baseno tamanho dos blocos */
-    defineBlockSpace(){
-        for(let i = 0; i < canvas.width; i+=(new Blocks).width){
-            this.blockSpace.push(i);
+    selectBlockSpaces(){
+        this.selectedBlockSpace = Math.round(Math.random()*this.blockSpacesLength);
+        if(this.selectedBlockSpaces.length < this.blockSpaces.length){
+            if(this.selectedBlockSpaces.includes(this.selectedBlockSpace)){
+                this.selectBlockSpaces();
+            }else{
+                this.selectedBlockSpaces.push(this.selectedBlockSpace);
+                return this.selectedBlockSpace;
+            }
         }
-    }
-
-    /* loop da classe para animar os blocos */
-    loopMatrix(){
-        requestAnimationFrame(()=>{
-            this.loopMatrix();
-        });
-        this.pickSpaceBlocks();
-        this.clearCanvas();
-        this.deleteBlocks();
-
-        this.blocks.forEach((block, key)=>{
-            block.createBlocks();
-            block.moveBlocks();
-        });
-        
-        if(this.countToCreateBlocks > this.countThreshold){
-            this.countToCreateBlocks = 0;
-            this.createBlocks();
-        }
-        this.countToCreateBlocks++;
-    }
-
-    clearCanvas(){
-        //ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.globalAlpha = 0.3;
-        ctx.fillStyle = "green";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        
-        ctx.stroke();
-        
     }
 
     deleteBlocks(){
         this.blocks.forEach((block, key)=>{
-            if(block.y > canvas.height){
-                this.blocks.splice(key, 0);
+            if(block.globalAlpha <= 0.75){
+                this.blocks.splice(key, 1);
+                this.selectedBlockSpaces.splice(key, 1);
             }
-        })
+        });
+    }
+
+    clearCanvas(){
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.save()
+        ctx.fillStyle = "green";
+        ctx.globalAlpha = 0.1;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+    }
+
+    loopGame(){
+        let thisObject = this;
+        requestAnimationFrame(()=>{
+            thisObject.loopGame();
+        });
+        this.countGameSpeed++;
+        
+        if(this.countGameSpeed > this.gameSpeedTreshold){
+            this.countGameSpeed = 0;
+            
+            this.deleteBlocks();
+            this.clearCanvas();
+            this.loadBlocks();
+            if(this.blocks.length >= 1){
+                this.blocks.forEach((block)=>{
+                    block.moveBlocks();
+                    block.renderBlock();
+                });
+            }
+        }
     }
 }
 
 async function main(){
-    let m = new matrix();
-    await m.defineBlockSpace();
-    await m.pickSpaceBlocks();
-    m.loopMatrix();
+    let g = new Game();
+    await g.defineBlockSpaces();
+    await g.loopGame();
 }
 main();
-
