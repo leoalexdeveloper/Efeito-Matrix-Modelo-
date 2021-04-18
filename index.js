@@ -41,7 +41,7 @@ class Blocks{
         ctx.globalAlpha = this.globalAlpha.toFixed(1);
         ctx.font = "20px Georgia";
         ctx.fillText(String.fromCharCode(this.randomCharacters()), this.x, this.y);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = "white";
         
     }
 }
@@ -100,7 +100,7 @@ class Game{
         //ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         ctx.save()
-        ctx.fillStyle = "green";
+        ctx.fillStyle = "black";
         ctx.globalAlpha = 0.1;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.restore();
