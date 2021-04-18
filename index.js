@@ -41,7 +41,9 @@ class Blocks{
         ctx.globalAlpha = this.globalAlpha.toFixed(1);
         ctx.font = "20px Georgia";
         ctx.fillText(String.fromCharCode(this.randomCharacters()), this.x, this.y);
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "rgb(0,255,0)";
+        ctx.shadowColor = "rgba(255,255,255,0.5)";
+        ctx.shadowBlur = 0.2;
         
     }
 }
@@ -89,7 +91,7 @@ class Game{
 
     deleteBlocks(){
         this.blocks.forEach((block, key)=>{
-            if(block.globalAlpha <= 0.75){
+            if(block.globalAlpha <= canvas.height/2900){
                 this.blocks.splice(key, 1);
                 this.selectedBlockSpaces.splice(key, 1);
             }
@@ -98,12 +100,12 @@ class Game{
 
     clearCanvas(){
         //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
         
-        ctx.save()
         ctx.fillStyle = "black";
         ctx.globalAlpha = 0.1;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.restore();
+        ctx.save();
     }
 
     loopGame(){
