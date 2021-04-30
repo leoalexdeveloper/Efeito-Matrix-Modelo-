@@ -26,7 +26,7 @@ class Blocks{
         this.countAlpha++;
         if(this.countAlpha > this.tresholdAlpha){
             this.countAlpha = 0;
-            this.globalAlpha -= 0.2;
+            this.globalAlpha -= 0.1;
             if(this.globalAlpha <= 0){
                 this.globalAlpha = 0;
             }
@@ -60,12 +60,9 @@ class Game{
     
 
     loadBlocks(){
-        //for(let i = 0; i < Math.round(Math.random()*10); i++){
             let blocks = new Blocks();
             blocks.x = this.blockSpaces[this.selectBlockSpaces()];
-            this.blocks.push(blocks);
-        //}
-        
+            this.blocks.push(blocks);    
     }
 
     defineBlockSpaces(){
@@ -90,7 +87,7 @@ class Game{
 
     deleteBlocks(){
         this.blocks.forEach((block, key)=>{
-            if(block.globalAlpha <= canvas.height/2900){
+            if(block.y > canvas.height){
                 this.blocks.splice(key, 1);
                 this.selectedBlockSpaces.splice(key, 1);
             }
@@ -98,12 +95,18 @@ class Game{
     }
 
     clearCanvas(){
-        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         ctx.restore();
+        
         ctx.fillStyle = "black";
         ctx.globalAlpha = 0.1;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
         ctx.save();
+        if(this.blocks.length == this.blockSpaces.length-1){
+            ctx.clearRect(this.blocks[0].x, this.blocks[0].y, this.blocks[0].width, this.blocks[0].height);
+            //ctx.clearRect(0, 0, canvas.width,canvas.height);
+        }
     }
 
     loopGame(){
