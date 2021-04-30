@@ -26,7 +26,7 @@ class Blocks{
         this.countAlpha++;
         if(this.countAlpha > this.tresholdAlpha){
             this.countAlpha = 0;
-            this.globalAlpha -= 0.1;
+            this.globalAlpha -= 0.01;
             if(this.globalAlpha <= 0){
                 this.globalAlpha = 0;
             }
@@ -34,7 +34,7 @@ class Blocks{
     }
 
     randomCharacters(){
-        return Math.round(Math.random()*128);
+        return Math.round(Math.random()*64 + 64);
     }
 
     renderBlock(){
@@ -118,9 +118,10 @@ class Game{
         
         if(this.countGameSpeed > this.gameSpeedTreshold){
             this.countGameSpeed = 0;
-            
-            this.deleteBlocks();
+
             this.clearCanvas();
+            this.deleteBlocks();
+            
             this.loadBlocks();
             if(this.blocks.length >= 1){
                 this.blocks.forEach((block)=>{
@@ -135,6 +136,9 @@ class Game{
 async function main(){
     let g = new Game();
     await g.defineBlockSpaces();
+    for(let i = 0; i < g.blockSpaces.length; i++){
+        await g.loadBlocks();
+    }
     await g.loopGame();
 }
 main();
