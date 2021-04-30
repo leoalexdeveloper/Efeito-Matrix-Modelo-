@@ -55,7 +55,7 @@ class Game{
         this.selectedBlockSpace = ''
         this.selectedBlockSpaces = [];
         this.countGameSpeed = 0;
-        this.gameSpeedTreshold = 1;
+        this.gameSpeedTreshold = 0.1;
     }
     
 
@@ -95,7 +95,11 @@ class Game{
     }
 
     clearCanvas(){
-        
+        if(this.blocks.length == this.blockSpaces.length-1){
+            for(let i = 0; i < this.blockSpacesLength-1; i++){
+                ctx.clearRect(this.blocks[i].x, this.blocks[i].y, this.blocks[i].width, this.blocks[i].height);
+            }
+        }
         ctx.restore();
         
         ctx.fillStyle = "black";
@@ -103,10 +107,6 @@ class Game{
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.save();
-        if(this.blocks.length == this.blockSpaces.length-1){
-            ctx.clearRect(this.blocks[0].x, this.blocks[0].y, this.blocks[0].width, this.blocks[0].height);
-            //ctx.clearRect(0, 0, canvas.width,canvas.height);
-        }
     }
 
     loopGame(){
@@ -114,7 +114,7 @@ class Game{
         requestAnimationFrame(()=>{
             thisObject.loopGame();
         });
-        this.countGameSpeed++;
+        this.countGameSpeed+=0.1;
         
         if(this.countGameSpeed > this.gameSpeedTreshold){
             this.countGameSpeed = 0;
